@@ -1,0 +1,295 @@
+/* ─── Font: TT Firs Neue Trial Var Roman ────────────────────── */
+/*
+  Tries system-installed font first (Figma users typically have it installed).
+  Falls back to /public/fonts/TT-Firs-Neue-Trial-Var.woff2 if not found.
+*/
+@font-face {
+  font-family: 'TT Firs Neue Trial Var Roman';
+  src:
+    local('TT Firs Neue Trial Var Roman Medium'),
+    local('TT Firs Neue Trial Var Roman'),
+    local('TT Firs Neue Trial'),
+    url('/fonts/TT-Firs-Neue-Trial-Var.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ─── Reset ──────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ─── App shell ──────────────────────────────────────────────── */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: #141414;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-family: sans-serif;
+}
+
+#root {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* ─── Keyboard wrapper (sits above the ripple canvas) ───────── */
+.keyboard-wrapper {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Card ───────────────────────────────────────────────────── */
+/*
+  Figma: w-[534px], pt-[25px] pb-[33px] px-[33px], rounded-[32px]
+  bg: gradient #2c2c2e → #202022
+  border: 1px solid rgba(255,255,255,0.05)
+  shadow: 0px 40px 80px rgba(0,0,0,0.6)
+  inset: inset 0 1px 1px rgba(255,255,255,0.08), inset 0 -1px 1px rgba(0,0,0,0.4)
+*/
+.keyboard-card {
+  position: relative;
+  width: 534px;
+  padding: 25px 33px 33px;
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: linear-gradient(180deg, #2c2c2e 0%, #202022 100%);
+  box-shadow:
+    0px 40px 80px 0px rgba(0, 0, 0, 0.6),
+    inset 0px 1px 1px 0px rgba(255, 255, 255, 0.08),
+    inset 0px -1px 1px 0px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ─── Top bar ────────────────────────────────────────────────── */
+.top-bar {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* ─── LED light — exact Figma spec (node 134:135) ─────────────
+   Container  : 32×32, gradient #202022→#2c2c2e, border 0.4px #9f9fa9
+                overflow:clip so the glow is contained within the circle
+   Dot        : 12×12 at (9.6, 9.6), bg #ffbdec
+   Glow overlay: same 12×12, centered; outer glow + inner top-highlight
+   Animation  : smooth breathing on the glow — dot core stays solid,
+                only the halo pulses (3s ease-in-out loop)
+──────────────────────────────────────────────────────────────── */
+.led-container {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 100px;
+  background: linear-gradient(180deg, #202022 0%, #2c2c2e 100%);
+  border: 0.4px solid #363636;
+  position: relative;
+  overflow: clip; /* clips descendant glow to the circle boundary */
+}
+
+/* Pink core dot — 12×12, perfectly centred in the 32×32 container */
+.led-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 100px;
+  background: #ffbdec;
+}
+
+/* Glow overlay — exactly centred over the dot (Figma: translate -50%/-50%) */
+.led-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 100px;
+  pointer-events: none;
+  /* outer halo + inner top-highlight in one declaration */
+  box-shadow:
+    0px 0px 12px 2px rgba(255, 151, 151, 0.7),
+    inset 0px 1px 2px 0px white;
+  animation: led-breathe 3s ease-in-out infinite;
+}
+
+/* Smooth breathing: glow fades while the pink core stays visible */
+@keyframes led-breathe {
+  0%, 100% {
+    opacity: 1;
+    box-shadow:
+      0px 0px 12px 2px rgba(255, 151, 151, 0.7),
+      inset 0px 1px 2px 0px white;
+  }
+  50% {
+    opacity: 0.22;
+    box-shadow:
+      0px 0px 4px 1px rgba(255, 151, 151, 0.2),
+      inset 0px 1px 2px 0px white;
+  }
+}
+
+/* Divider line between LED and brand text */
+.divider-wrap {
+  flex: 1;
+  padding: 0 24px;
+}
+
+.divider {
+  height: 1px;
+  background: #3a3a3c;
+  box-shadow: 0px 1px 0px 0px rgba(255, 255, 255, 0.05);
+}
+
+/* //R brand text — TT Firs Neue Trial Var Roman, Medium 24px, tracking -1.5px */
+.brand-text {
+  flex-shrink: 0;
+  color: #aaaaaf;
+  font-family: 'TT Firs Neue Trial Var Roman', 'TT Firs Neue Trial', system-ui, sans-serif;
+  font-size: 24px;
+  font-weight: 500;   /* Medium */
+  font-style: normal;
+  letter-spacing: -1.5px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* ─── Key bed ────────────────────────────────────────────────── */
+/*
+  Contains white keys in a flex row + black keys absolutely positioned.
+  Width = 7 × 60px + 6 × 8px gap = 420 + 48 = 468px = card content width ✓
+*/
+.key-bed {
+  position: relative;
+  width: 100%;
+}
+
+.white-keys {
+  display: flex;
+  gap: 8px;
+}
+
+/* ─── White key ──────────────────────────────────────────────── */
+/*
+  Default: 60×180, gradient #3e3c3d→#454344, border #252525, rounded-12
+  Active : radial pink gradient, #ff44aa border, pink glow
+*/
+.key--white {
+  flex-shrink: 0;
+  width: 60px;
+  height: 180px;
+  border-radius: 12px;
+  border: 1px solid #252525;
+  background: linear-gradient(180deg, #3e3c3d 0%, #454344 100%);
+  box-shadow:
+    0px 4px 8px 0px rgba(0, 0, 0, 0.4),
+    inset 0px 2px 2px 1px rgba(255, 255, 255, 0.05),
+    inset 0px -4px 6px 1px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  position: relative;
+  /* transform-origin: top → key bottom "sinks", top edge stays fixed */
+  transform-origin: top center;
+  /* On RELEASE: spring cubic-bezier overshoots scaleY=1 briefly → bounce feel.
+     Glow lingers longest, background next, border snaps first. */
+  transition:
+    transform    380ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow   420ms ease-out,
+    background   340ms ease-out,
+    border-color 260ms ease-out;
+}
+
+.key--white:hover:not(.key--active) {
+  filter: brightness(1.15);
+}
+
+/* Active state — transition: none means ENTERING is instant (press + glow appear together) */
+.key--white.key--active {
+  border: 1px solid #ff44aa;
+  /* Compress from bottom: ~96.5% of 180px ≈ 6px shorter at the bottom */
+  transform: scaleY(0.965);
+  /* Radial gradient: origin above top-center of key (30px, −22px) → covers full 60×180 key */
+  background: radial-gradient(
+    ellipse 320% 260% at 50% -12%,
+    rgba(255, 189, 236, 1) 0%,
+    rgba(255, 219, 209, 1) 16.747%,
+    rgba(255, 169, 207, 1) 58.373%,
+    rgba(255, 119, 204, 1) 100%
+  );
+  box-shadow:
+    0px 0px 24px 8px rgba(255, 100, 200, 0.25),
+    0px 4px 8px 0px rgba(255, 100, 200, 0.4),
+    inset 0px 2px 4px 1px white,
+    inset 0px -4px 8px 1px rgba(200, 0, 100, 0.4);
+  /* Instant appear: new computed transition is none */
+  transition: none;
+}
+
+/* ─── Black key ──────────────────────────────────────────────── */
+/*
+  Default: 36×100, gradient #252525→#2a2a2a, border 0.4px #252525, rounded-8
+  Positions (from Figma, absolute within key-bed):
+    C# 46px  D# 114px  F# 250px  G# 318px  A# 386px
+*/
+.key--black {
+  position: absolute;
+  top: 0;
+  width: 36px;
+  height: 100px;
+  border-radius: 8px;
+  border: 0.4px solid #252525;
+  background: linear-gradient(180deg, #252525 0%, #2a2a2a 100%);
+  box-shadow:
+    0px 8px 12px 0px rgba(0, 0, 0, 0.42),
+    inset 0px 2px 2px 1px rgba(255, 255, 255, 0.1),
+    inset 0px -4px 6px 1px rgba(0, 0, 0, 0.8);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  z-index: 2;
+  transform-origin: top center;
+  transition:
+    transform    380ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow   420ms ease-out,
+    background   340ms ease-out,
+    border-color 260ms ease-out;
+}
+
+.key--black.key--active {
+  border-color: #ff44aa;
+  /* Compress ~4px at the bottom: 100px × 0.96 = 96px */
+  transform: scaleY(0.96);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 120, 210, 0.85) 0%,
+    rgba(200, 0, 120, 0.75) 100%
+  );
+  box-shadow:
+    0px 0px 16px 6px rgba(255, 100, 200, 0.35),
+    0px 4px 8px 0px rgba(255, 100, 200, 0.5),
+    inset 0px 2px 4px 1px rgba(255, 255, 255, 0.6),
+    inset 0px -4px 8px 1px rgba(180, 0, 100, 0.7);
+  transition: none;
+}
